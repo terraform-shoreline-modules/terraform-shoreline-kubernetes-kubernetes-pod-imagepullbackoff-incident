@@ -1,0 +1,102 @@
+{
+  "name": "kubernetes_pod_imagepullbackoff_incident",
+  "description": "A Kubernetes Pod ImagePullBackOff incident occurs when a pod in a Kubernetes cluster is unable to pull its container image. This can happen due to various reasons, such as incorrect image path or tag, or misconfigured image pulling credentials. This incident can cause the pod to fail to start and impact the availability of the application running in the pod. It requires investigation and resolution to ensure the pod can pull its container image and restart successfully.",
+  "params": [
+    {
+      "name": "IMAGE_NAME",
+      "value": ""
+    },
+    {
+      "name": "DEPLOYMENT_NAME",
+      "value": ""
+    },
+    {
+      "name": "IMAGE_TAG",
+      "value": ""
+    },
+    {
+      "name": "POD_NAME",
+      "value": ""
+    },
+    {
+      "name": "CONTAINER_NAME",
+      "value": ""
+    },
+    {
+      "name": "NAMESPACE",
+      "value": ""
+    },
+    {
+      "name": "K8S_CLUSTER_NAME",
+      "value": ""
+    }
+  ],
+  "cells": [
+    {
+      "name": "cell_1",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Kubernetes Pod ImagePullBackOff Incident\nA Kubernetes Pod ImagePullBackOff incident occurs when a pod in a Kubernetes cluster is unable to pull its container image. This can happen due to various reasons, such as incorrect image path or tag, or misconfigured image pulling credentials. This incident can cause the pod to fail to start and impact the availability of the application running in the pod. It requires investigation and resolution to ensure the pod can pull its container image and restart successfully."
+    },
+    {
+      "name": "cell_2",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the status of the pod"
+    },
+    {
+      "name": "cell_3",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "pod | k8s_cluster_name=$K8S_CLUSTER_NAME | app='shoreline' | limit=1 | random=1 | `kubectl describe pod ${POD_NAME} -n ${NAMESPACE}`"
+    },
+    {
+      "name": "cell_4",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the events related to the pod"
+    },
+    {
+      "name": "cell_5",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "pod | k8s_cluster_name=$K8S_CLUSTER_NAME | app='shoreline' | limit=1 | random=1 | `kubectl get events -n ${NAMESPACE} --sort-by=.metadata.creationTimestamp | grep ${POD_NAME}`"
+    },
+    {
+      "name": "cell_6",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the credentials used for pulling the container image"
+    },
+    {
+      "name": "cell_7",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "pod | k8s_cluster_name=$K8S_CLUSTER_NAME | app='shoreline' | limit=1 | random=1 | `kubectl get secrets -n ${NAMESPACE}`"
+    },
+    {
+      "name": "cell_8",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the image path and tag specified in the pod configuration"
+    },
+    {
+      "name": "cell_9",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "pod | k8s_cluster_name=$K8S_CLUSTER_NAME | app='shoreline' | limit=1 | random=1 | `kubectl describe pod ${POD_NAME} -n ${NAMESPACE} | grep image:`"
+    },
+    {
+      "name": "cell_10",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Restart the pod or the entire Kubernetes deployment to attempt to pull the image again."
+    },
+    {
+      "name": "cell_11",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "pod | k8s_cluster_name=$K8S_CLUSTER_NAME | app='shoreline' | random=1 | limit=1 | invoke_restart_pod_or_deployment($DEPLOYMENT_NAME, $POD_NAME)"
+    }
+  ]
+}
